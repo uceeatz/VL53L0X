@@ -636,11 +636,10 @@ class VL53L0X:
         return True
 
     def perform_single_ref_calibration(self, vhv_init_byte):
-        chrono = Timer.Chrono()
         self._register(SYSRANGE_START, 0x01|vhv_init_byte)
-        chrono.start()
+        startTime = utime.ticks_ms()
         while self._register((RESULT_INTERRUPT_STATUS & 0x07) == 0):
-            time_elapsed = chrono.read_ms()
+            time_elapsed = utime.ticks_diff(utime.ticks_ms(), startTime)
             if time_elapsed > _IO_TIMEOUT:
                 return False
         self._register(SYSTEM_INTERRUPT_CLEAR, 0x01)
